@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="sty/new_test.css">
+        <script src="./js/easel_min.js"></script>
+        <script src="./js/eventemitter2_min.js"></script>
+        <script src="./js/roslib.js"></script>
+        <script src="./js/ros2d.js"></script>
+        <script src="./js/nipple.js"></script>
+        <script src="./js/nav2d.js"></script>
+        <script src="js/mjpegcanvas.min.js"></script>
+        <script src="js/jquery.js"></script>
+    </head>
+    <body onload="init()">
+        <div class="container">
+            <nav id="nav" style="background-color:rgb(241, 77, 77);">
+                <div id="open" style=" font-size:30px;cursor:pointer; width:30px " class="openNav"
+                    onclick="openNav()">&#9776;</div>
+                <div class="ROS_connect" id="connecting">wait connect...</div>
+                
+            </nav>
+            
+            <div class="con">
+                
+                <div class="sd-l">
+                    <a href="#" id="home_sd" onclick="home() " style="background-color: #8bd3e6;"><img src="./imges/home-icon.png" alt=""><span>Home</span></a>
+                    <a href="#" id="map_sd" onclick="map()" style="background-color: #8bd3e6;"><img src="./imges/map.png" alt=""><span>Map</span></a>
+                    <a href="#" id="message_sd" onclick="message()" style="background-color: #8bd3e6;"><img src="./imges/restaurant-waiter-robot.png" alt=""><span>Position</span></a>
+                    <a href="#" id="setting_sd" onclick="setting()" style="background-color: #8bd3e6;"><img src="./imges/free-settings-icon-3110-thumb.png"  alt=""><span>Setting</span></a>
+                </div>
+                <div class="wel" id="wel" style="margin-left: 20px;margin-top: 30px;">
+                    <b style="margin-left: 10%;font-size:25px;">Welcome to the web of ROS</b><br>
+                    <img src="./imges/click.gif" alt="" style="width:100px ;">
+                    <span style="color: brown;">please open sidebar to connect ros</span> 
+                    
+                </div>
+                <div id="Gmapping" style="display:none; margin: 10% 10%;">
+                    <div class="contant1" id="contant1">
+                        <div class="nav_info">
+                            <b>Current Method: <span>navigation</span></b><br>
+                            <b>Navigation status: <span id="nav_status">wait data ...</span></b>
+                        </div>
+                        
+                    </div>
+                    <div class="contant2" id="contant2" >
+                        <div id="map_container" style="height: 300px;">
+                            <div id="map"></div>
+                            <div id="camara" style="display:none ;height:300px;width:300px;">
+                                <img id="cam" src="" style="height:300px;width:300px;" alt="/imge/raw">
+                            </div> 
+                        </div>
+                        
+                        <div class="map_zoom">
+                            <button id="add_map" style="width: 50px;height: 50px;" onclick="MapZoom()">十</button>
+                            <button id="reduce_map"style="width: 50px;height: 50px;" onclick="MapPan()">一</button>
+                            <button id="change"style="width: 50px;height: 50px;" onclick="change()">切換</button>
+                        </div>
+                        
+                        
+                    </div>
+
+                        <div id="zone_joystick" style="position: relative;width: 300px; height: 300px; "></div>
+
+                    
+
+                    
+                    <div class="contant3" id="contant3" style="display: none;">
+                        <div id="navigation" class="navigation">
+                            <div id="tirt" class="tirt" >
+                                <div class="tirt_nav" style="margin-top: 1%;"><b >定點導航 <select  id="goto" style="margin-left: 20px;"></select><button id="go" onclick="go()">go</button> </b><span style="margin-right: 0;"><button id="ref" >refresh</button ><button id="write" >save</button></span></div>
+                                <div class="set_goal" id="set_goal" style="background-color:rgb(221, 221, 221) ;display: none;"></div>  
+                                <div class="add_new_pose">
+                                    <button id="add_new_pose" style="width: 30px;height: 30px;font-size: 20px;" onclick="add_new_pose()">+</button>
+                                    <button id="reduce_new_pose" style="width: 30px;height: 30px;font-size: 20px;" onclick="reduce_new_pose()">-</button>
+                                </div>
+                                
+                            </div>
+                            <div class="pose_msg" id="pose_msg" style="background-color: #8bd3e6;border-radius: 5px;height: 10%;padding: 20px;margin-top: 5%;">
+                                
+                                <b>位置顯示</b>
+                                <select id="select_pose">
+                                    <option value="position">position</option>
+                                    <option value="orientation">orientation</option>
+                                </select>
+                                <div id="position">
+                                <p>position X： <span id="poseX"></span> </p>
+                                <p>position Y： <span id="poseY"></span> </p>
+                                <p>position Z： <span id="poseZ"></span> </p>
+                                </div>
+                                <div id="orientation" style="display: none;">
+                                <p>orientation X： <span id="orientationX"></span> </p>
+                                <p>orientation Y： <span id="orientationY"></span> </p>
+                                <p>orientation Z： <span id="orientationZ"></span> </p>
+                                <p>orientation W： <span id="orientationW"></span> </p>
+                                </div>  
+                            </div>
+                            
+                        </div>  
+                    </div>
+                    <div class="contant4" id="contant4"style="display:none;">
+                        
+                        <div class="topic_info" style="font-size: 20px; margin-bottom: 10%;">
+                            <p ><b> All Topic  </b> <button onclick="getTopics()">更新</button></p>
+                            <div class="topic" id="all_topic"></div>
+                        </div>
+                        
+                        <div class="cmd_vel_sub" style="margin-bottom: 10%;">
+                            <b style="font-size: 20px; ">速度控制</b>
+                            <p style="margin:1% 10% ">cmd_vel話題訂閱 
+                            <select name="vel_topic" id="vel_topic" onchange="pub_cmd_vel(this.value)">
+                                <option ></option>
+                            </select>
+                            </p>
+                            <div class="velocity" >
+                                <div class="linear" style="margin:3% 10% 0 10%; ">
+                                    <b style="margin-bottom: 10px;">Linear Velocity Max</b><br>
+                                    <input type="range" id="linear_velocity" min="1" max="100">
+                                    <span id="linear_value">50</span>%
+                                </div>
+                                <div class="angular" style="margin:3% 10% 0 10%;">
+                                    <b>Angular Velocity Max</b><br>
+                                    <input type="range" id="angular_velocity" min="1" max="100">
+                                    <span id="angular_value">50</span>%
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="camara_sub">
+                            <b style="font-size: 20px; ">影像傳輸</b>
+                            <p style="margin:1% 10% ">camara話題訂閱
+                                <select name="cam_topic" id="Cam_topic" onchange="getOption(this.value)">
+                                    <option ></option>
+                                </select>
+                            </p>
+                        </div>
+                        <div class="initial_positioning" style="margin-top: 10%;">
+                            <b style="font-size: 20px; ">初始位置</b>
+                            <p style="margin:1% 10% ">
+                                X:<input type="text" id="initposex" style="width:25px;margin-right: 5px;">Y:<input type="text" id="initposey" style="width:25px ;">
+                                <button onclick="init_pose()"> 設定</button>
+                            </p>
+                            <div class="pose_msg1" id="pose_msg" style="background-color: #8bd3e6;border-radius: 5px;height: 12%;margin: 3% 10%;padding: 20px;">
+                                
+                                <b>位置顯示</b>
+                                <select id="select_pose1">
+                                    <option value="position">position</option>
+                                    <option value="orientation">orientation</option>
+                                </select>
+                                <div id="position1">
+                                <p>position X： <span id="poseX1"></span> </p>
+                                <p>position Y： <span id="poseY1"></span> </p>
+                                <p>position Z： <span id="poseZ1"></span> </p>
+                                </div>
+                                <div id="orientation1" style="display: none;">
+                                <p>orientation X： <span id="orientationX1"></span> </p>
+                                <p>orientation Y： <span id="orientationY1"></span> </p>
+                                <p>orientation Z： <span id="orientationZ1"></span> </p>
+                                <p>orientation W： <span id="orientationW1"></span> </p>
+                                </div>  
+                            </div>
+                           
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            
+            
+            <!-- =================sidbar =======================-->
+            <div class="sidebar" id="mySidenav">
+                <a href="#" class="closebtn" onclick="closeNav()">&times;</a>
+
+                <p>機器人狀態：<img id="side_ip" src="" alt="" ><span id="connect"></span>
+                  <input type="button" class ="open" value="連線" onclick="ip_connect()"></input>
+                  <input type="button" value="斷線" onclick="ip_close()"></input>
+                </p>
+                <p>請輸入連線ip ：<span class="ws"> ws://</span> 
+                  <input type="text" id="hostname" placeholder="127.0.0.1" style="width: 100px;">
+                  <span>:9090</span>
+                </p>
+                <!-- <p>目前ip：<span id="ip_status"></span></p> -->
+                <div id="mode_select" class="mode_select">
+                    
+                    <a id="select_gmapping" href="#" class="select_gmapping" onclick="mode_check_1()">gmapping</a>
+                    <a id="select_navigation" href="#" class="select_navigation"onclick="mode_check_2()">navigation</a>
+                </div>
+                
+
+
+                <select id="map_select" class="map_select" style="display: none; ">
+                    <option value="null">NavMapSelect</option>
+                    <option value="map">map</option>
+                </select>
+                <div id="mapsave" class="mapsave" style="display: none;">
+                    <p>地圖存檔</p>
+                    <input id="map_file" type="text" ><button onclick="map_save()">存檔</button>
+                </div>
+                <div class="current_date" id="current_date">
+                    <p>
+                      現在時間: <br>
+                      <span id="mT"></span>
+                    </p>
+                </div>
+            </div>  
+        </div>
+        <script src="js/new_test.js"></script>
+        <script>
+            // ========================================
+            //               ros2d map
+            // ========================================
+            var viewer = new ROS2D.Viewer({
+                divID : 'map',
+                width : 300,
+                height : 300
+            });
+            //set nav client
+            var nav_client = NAV2D.OccupancyGridClientNav({
+                ros:ros,
+                continuous:true,
+                rootObject:viewer.scene,
+                view:viewer,
+                serverName:'/move_base',
+                withOrientation:true,
+            });
+            //navigation status
+            var MoveBaseStatusTopic = new ROSLIB.Topic({
+                ros:ros,
+                name:'/move_base/status',
+                messageType:'actionlib_msgs/GoalStatusArray'
+            });
+            MoveBaseStatusTopic.subscribe(function(message){
+            var nav_status=document.getElementById('nav_status');
+            nav_status.innerHTML = message.status_list[0].text;
+            });
+            // draw the plan
+            var pathShape = new ROS2D.PathShape({
+                strokeSize:0.1,
+                strokeColor:createjs.Graphics.getRGB(0,255,0,0.5)
+            });
+            var listener = new ROSLIB.Topic({
+                ros:ros,
+                name:'/move_base/NavfnROS/plan',
+                messageType:'nav_msgs/Path'
+            });
+            viewer.scene.addChild(pathShape);
+            listener.subscribe(function(message){
+            console.log(message);
+            pathShape.setPath(message);
+            });
+            
+        </script>
+    </body>
+</html>
